@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%99%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>Admin — Moving Sale</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1115;--card:#181c23;--card2:#1f242d;--line:#2a303b;--txt:#e8eaed;--dim:#9aa3b2;--accent:#4ade80;--danger:#f87171;--warn:#fbbf24;--radius:12px}
+body{background:var(--bg);color:var(--txt);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:26px 18px 90px}
+h1{font-size:24px;letter-spacing:-.01em}
+.sub{color:var(--dim);font-size:14px;margin-top:5px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:18px}
+.panel h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin-bottom:12px}
+label{display:block;font-size:12.5px;color:var(--dim);font-weight:600;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:9px;color:var(--txt);padding:10px 12px;font:inherit;font-size:14.5px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:70px}
+.row{display:grid;gap:12px;margin-bottom:12px}
+.r2{grid-template-columns:1fr 1fr}
+.r3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.r2,.r3{grid-template-columns:1fr}}
+button{font:inherit;font-weight:650;font-size:14.5px;border-radius:9px;padding:11px 18px;border:1px solid var(--line);background:var(--card2);color:var(--txt);cursor:pointer}
+button:hover{border-color:#3a4250}
+button.primary{background:var(--accent);color:#06240f;border-color:var(--accent)}
+button.primary:hover{background:#22c55e}
+button.danger{color:var(--danger)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.item{border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;background:var(--card)}
+.item>.hd{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--card2)}
+.item>.hd:hover{background:#242a34}
+.item>.hd .nm{font-weight:650;flex:1;font-size:15px}
+.item>.bd{padding:14px;border-top:1px solid var(--line);display:none}
+.item.open>.bd{display:block}
+.tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.05em}
+.t-vendido{background:rgba(75,85,99,.9);color:#e5e7eb}
+.t-a_venda{background:rgba(74,222,128,.9);color:#06240f}
+.t-negociando{background:rgba(251,191,36,.9);color:#3d2c00}
+.t-reservado{background:rgba(96,165,250,.9);color:#04203d}
+.t-disputa{background:rgba(248,113,113,.9);color:#3d0000}
+.msg{padding:11px 14px;border-radius:9px;font-size:14px;margin-top:14px;display:none}
+.msg.ok{display:block;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);color:#86efac}
+.msg.err{display:block;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.35);color:#fca5a5}
+.msg.info{display:block;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.35);color:#93c5fd}
+.hint{color:var(--dim);font-size:13px;margin-top:8px}
+.hint code{background:var(--card2);padding:2px 6px;border-radius:5px;font-size:12.5px}
+a{color:var(--accent)}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.stats{display:flex;gap:16px;flex-wrap:wrap;color:var(--dim);font-size:13.5px;margin-top:10px}
+.stats b{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div>
+      <h1>Admin — Moving Sale</h1>
+      <p class="sub">Edita <code>data/inventory.json</code> direto no GitHub. Salvar = commit → Cloudflare Pages rebuilda.</p>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div>
+      <button id="btnToken">Token do GitHub</button>
+      <button id="btnReload">Recarregar</button>
+    </div>
+  </div>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="panel" id="authPanel" style="display:none">
+    <h2>Token do GitHub</h2>
+    <label for="token">Personal Access Token (escopo <code>repo</code>)</label>
+    <input type="password" id="token" placeholder="ghp_... ou github_pat_..." autocomplete="off">
+    <div class="actions">
+      <button class="primary" id="btnSaveToken">Salvar no navegador</button>
+      <button id="btnClearToken">Esquecer token</button>
+    </div>
+    <p class="hint">Fica só no <code>localStorage</code> deste navegador — nunca é comitado nem enviado a outro servidor além da API do GitHub. Crie em
+      <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a> com escopo <code>repo</code>.</p>
+  </div>
+
+  <div id="items"></div>
+
+  <div class="actions" style="margin-top:22px">
+    <button class="primary" id="btnSave">Salvar tudo no GitHub</button>
+    <button id="btnNew">+ Novo item</button>
+  </div>
+  <p class="hint">O arquivo no repo: <a id="repoLink" href="#" target="_blank" rel="noopener">data/inventory.json</a></p>
+
+</div>
+
+<script>
+const OWNER  = 'igorgomes3';
+const REPO   = 'moving-sale';
+const BRANCH = 'main';
+const PATH   = 'data/inventory.json';
+
+let INV = null;
+let SHA = null;
+let dirty = false;
+
+const $ = (id) => document.getElementById(id);
+const msg = (text, kind) => { const m = $('msg'); m.className = 'msg ' + kind; m.textContent = text; };
+
+function token(){ return localStorage.getItem('gh_token') || ''; }
+function apiHeaders(){ return { 'Authorization': 'Bearer ' + token(), 'Accept': 'application/vnd.github+json' }; }
+function b64encode(s){ return btoa(unescape(encodeURIComponent(s))); }
+function b64decode(s){ return decodeURIComponent(escape(atob(s.replace(/\s/g,'')))); }
+
+$('repoLink').href = 'https://github.com/' + OWNER + '/' + REPO + '/blob/' + BRANCH + '/' + PATH;
+
+// ------------------------------------------------------------------ load
+
+async function load(){
+  msg('Carregando...', 'info');
+  try {
+    const r = await fetch('/data/inventory.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    INV = await r.json();
+    dirty = false;
+    renderAll();
+    msg('Carregado do site publicado.', 'ok');
+  } catch (e) {
+    msg('Falha ao carregar /data/inventory.json: ' + e.message, 'err');
+  }
+  if (token()) { try { await loadSha(); } catch (e) { /* sha opcional */ } } else { openAuth(); }
+}
+
+async function loadSha(){
+  const url = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PATH + '?ref=' + BRANCH;
+  const r = await fetch(url, { headers: apiHeaders() });
+  if (r.status === 401) throw new Error('token inválido');
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  SHA = j.sha;
+  return j;
+}
+
+// ------------------------------------------------------------------ render
+
+function renderStats(){
+  const sold = INV.items.filter(i => i.status === 'vendido');
+  const gross = sold.reduce((s,i) => s + (i.sold_price || 0), 0);
+  const potential = INV.items.filter(i => ['a_venda','negociando','reservado'].includes(i.status))
+                             .reduce((s,i) => s + (i.asking_price || 0), 0);
+  $('stats').innerHTML =
+    '<span><b>' + INV.items.length + '</b> itens</span>' +
+    '<span><b>' + sold.length + '</b> vendidos</span>' +
+    '<span>bruto vendido <b>R$ ' + gross.toFixed(2).replace('.',',') + '</b></span>' +
+    '<span>potencial <b>R$ ' + potential.toFixed(2).replace('.',',') + '</b></span>';
+}
+
+const STATUSES = ['a_venda','negociando','reservado','vendido'];
+const PAYMENTS = ['','recebido','pendente','disputa'];
+const PLATFORMS = ['','enjoei','facebook_marketplace','olx','condominio','outro'];
+const MODES = ['','classico','turbinado','gratis'];
+
+function opts(list, cur){
+  return list.map(v => '<option value="' + v + '"' + (v === (cur || '') ? ' selected' : '') + '>' + (v || '—') + '</option>').join('');
+}
+
+function renderAll(){
+  renderStats();
+  const box = $('items');
+  box.innerHTML = INV.items.map((it, idx) => `
+    <div class="item" data-idx="${idx}">
+      <div class="hd">
+        <span class="nm">${esc(it.name)}</span>
+        <span class="tag t-${it.status}">${it.status}</span>
+        ${it.payment_status === 'disputa' ? '<span class="tag t-disputa">disputa</span>' : ''}
+        <span style="color:var(--dim)">${it.sold_price != null ? 'R$ ' + it.sold_price : (it.asking_price != null ? 'pede R$ ' + it.asking_price : 'sem preço')}</span>
+      </div>
+      <div class="bd">
+        <div class="row r2">
+          <div><label>Nome</label><input data-k="name" value="${esc(it.name)}"></div>
+          <div><label>Categoria</label><input data-k="category" value="${esc(it.category || '')}"></div>
+        </div>
+        <div class="row r3">
+          <div><label>Status</label><select data-k="status">${opts(STATUSES, it.status)}</select></div>
+          <div><label>Situação do pagamento</label><select data-k="payment_status">${opts(PAYMENTS, it.payment_status)}</select></div>
+          <div><label>Plataforma</label><select data-k="platform">${opts(PLATFORMS, it.platform)}</select></div>
+        </div>
+        <div class="row r3">
+          <div><label>Modo Enjoei</label><select data-k="enjoei_mode">${opts(MODES, it.enjoei_mode)}</select></div>
+          <div><label>Preço pedido</label><input data-k="asking_price" type="number" step="0.01" value="${it.asking_price ?? ''}"></div>
+          <div><label>Preço vendido</label><input data-k="sold_price" type="number" step="0.01" value="${it.sold_price ?? ''}"></div>
+        </div>
+        <div class="row r3">
+          <div><label>Custo entrega/desloc.</label><input data-k="delivery_cost" type="number" step="0.01" value="${it.delivery_cost ?? ''}"></div>
+          <div><label>Líquido recebido (extrato)</label><input data-k="net_received" type="number" step="0.01" value="${it.net_received ?? ''}"></div>
+          <div><label>Quantidade</label><input data-k="qty" type="number" value="${it.qty ?? ''}"></div>
+        </div>
+        <div class="row">
+          <div><label>Condição</label><input data-k="condition" value="${esc(it.condition || '')}"></div>
+        </div>
+        <div class="row">
+          <div><label>Fotos (uma URL por linha)</label><textarea data-k="photos">${esc((it.photos || []).join('\n'))}</textarea></div>
+        </div>
+        <div class="row">
+          <div><label>Notas</label><textarea data-k="notes">${esc(it.notes || '')}</textarea></div>
+        </div>
+        <div class="actions">
+          <button class="danger" data-del="${idx}">Remover item</button>
+        </div>
+      </div>
+    </div>`).join('');
+  bind();
+}
+
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function bind(){
+  document.querySelectorAll('.item').forEach(el => {
+    el.querySelector('.hd').addEventListener('click', () => el.classList.toggle('open'));
+  });
+  document.querySelectorAll('[data-k]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const idx = +inp.closest('.item').dataset.idx;
+      const k = inp.dataset.k;
+      let v = inp.value;
+      if (inp.type === 'number') v = v === '' ? null : parseFloat(v);
+      if (k === 'photos') v = v.split('\n').map(s => s.trim()).filter(Boolean);
+      if (v === '') v = null;
+      INV.items[idx][k] = v;
+      dirty = true;
+      if (k === 'name' || k === 'status' || k === 'sold_price' || k === 'asking_price') renderAll();
+    });
+  });
+  document.querySelectorAll('[data-del]').forEach(b => {
+    b.addEventListener('click', () => {
+      const idx = +b.dataset.del;
+      if (!confirm('Remover "' + INV.items[idx].name + '"?')) return;
+      INV.items.splice(idx, 1);
+      dirty = true;
+      renderAll();
+    });
+  });
+}
+
+// ------------------------------------------------------------------ save
+
+async function save(){
+  if (!token()) { openAuth(); msg('Cole o token do GitHub primeiro.', 'err'); return; }
+  const btn = $('btnSave');
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  try {
+    await loadSha();
+    const body = JSON.stringify(INV, null, 2) + '\n';
+    const r = await fetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/' + PATH, {
+      method: 'PUT',
+      headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'chore(inventory): atualiza catalogo via /admin.html',
+        content: b64encode(body),
+        sha: SHA,
+        branch: BRANCH
+      })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (await r.text()).slice(0, 200));
+    dirty = false;
+    msg('Salvo. Commit feito no GitHub; o Cloudflare Pages rebuilda em ~1 min.', 'ok');
+  } catch (e) {
+    msg('Erro ao salvar: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Salvar tudo no GitHub';
+  }
+}
+
+function openAuth(){ $('authPanel').style.display = 'block'; }
+
+$('btnToken').addEventListener('click', () => {
+  const p = $('authPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+});
+$('btnSaveToken').addEventListener('click', async () => {
+  const v = $('token').value.trim();
+  if (!v) { msg('Token vazio.', 'err'); return; }
+  localStorage.setItem('gh_token', v);
+  $('token').value = '';
+  msg('Token salvo. Validando...', 'info');
+  try { await loadSha(); msg('Token válido. Pode salvar.', 'ok'); $('authPanel').style.display = 'none'; }
+  catch (e) { msg('Token não funcionou: ' + e.message, 'err'); }
+});
+$('btnClearToken').addEventListener('click', () => { localStorage.removeItem('gh_token'); msg('Token removido do navegador.', 'info'); });
+
+$('btnReload').addEventListener('click', () => {
+  if (dirty && !confirm('Há alterações não salvas. Recarregar mesmo assim?')) return;
+  load();
+});
+$('btnSave').addEventListener('click', save);
+$('btnNew').addEventListener('click', () => {
+  const id = prompt('ID do item (sem espaços, ex: sofa-3-lugares):');
+  if (!id) return;
+  INV.items.unshift({
+    id: id.trim().toLowerCase().replace(/\s+/g, '-'), name: 'Novo item', category: '',
+    qty: 1, condition: '', asking_price: null, sold_price: null, platform: null,
+    enjoei_mode: null, status: 'a_venda', payment_status: null, delivery_cost: null,
+    sold_at: null, photos: [], notes: ''
+  });
+  dirty = true; renderAll();
+  document.querySelector('.item').classList.add('open');
+});
+
+window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+load();
+</script>
+</body>
+</html>
