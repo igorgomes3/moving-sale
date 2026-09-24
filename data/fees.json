@@ -1,0 +1,53 @@
+{
+  "_comment": "Tabelas OFICIAIS de tarifas. Fonte: enjoei.com.br/l/tarifas (consultado 2026-09-25). A tarifa fixa e escalonada por faixa de preco - por isso a taxa efetiva varia por item.",
+  "enjoei": {
+    "source": "https://www.enjoei.com.br/l/tarifas",
+    "checked_at": "2026-09-25",
+    "modes": {
+      "classico": {
+        "commission_pct": 12.0,
+        "fixed_fee_bands": [
+          { "max_price": 15, "fixed": 2.50 },
+          { "max_price": 30, "fixed": 6.00 },
+          { "max_price": 50, "fixed": 6.50 },
+          { "max_price": 70, "fixed": 8.00 },
+          { "max_price": 100, "fixed": 10.00 },
+          { "max_price": 150, "fixed": 12.50 },
+          { "max_price": 300, "fixed": 21.50 },
+          { "max_price": 500, "fixed": 35.00 },
+          { "max_price": null, "fixed": 40.00 }
+        ]
+      },
+      "turbinado": {
+        "commission_pct": 18.0,
+        "fixed_fee_bands": [
+          { "max_price": 15, "fixed": 3.50 },
+          { "max_price": 30, "fixed": 7.50 },
+          { "max_price": 50, "fixed": 8.50 },
+          { "max_price": 70, "fixed": 10.50 },
+          { "max_price": 100, "fixed": 12.50 },
+          { "max_price": 150, "fixed": 16.50 },
+          { "max_price": 300, "fixed": 27.50 },
+          { "max_price": 500, "fixed": 45.00 },
+          { "max_price": null, "fixed": 50.00 }
+        ]
+      },
+      "gratis": {
+        "commission_pct": 0.0,
+        "fixed_fee_bands": [],
+        "note": "Sem comissao e sem tarifa fixa, mas exposicao limitada e sem incentivos de venda."
+      }
+    },
+    "extras": {
+      "envio_protegido": {
+        "note": "Opcional. Isento se o valor a receber for menor que R$25,63.",
+        "formula": "(valor_a_receber - 25.63) * 1.5% + 1.49"
+      },
+      "saque": { "free_per_month": 1, "fee_after": 3.00, "min_withdraw": 10.00 },
+      "inatividade": { "2_a_6_meses": 14.99, "apos_6_meses": 29.99 }
+    }
+  },
+  "marketplace": {
+    "note": "Facebook Marketplace: sem comissao. O valor cheio entra; o custo real e deslocamento/entrega, lancado por item em delivery_cost."
+  }
+}
