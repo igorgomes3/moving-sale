@@ -38,6 +38,13 @@ def fixed_fee(bands: list[dict], price: float) -> float:
     return 0.0
 
 
+def envio_protegido(amount: float) -> float:
+    """Envio protegido do Enjoei. Isento se o valor a receber for < R$25,63."""
+    if amount <= 25.63:
+        return 0.0
+    return round((amount - 25.63) * 0.015 + 1.49, 2)
+
+
 def platform_fee(item: dict, fees: dict) -> tuple[float, str]:
     """Retorna (valor_da_taxa, explicacao)."""
     gross = item.get("sold_price")
@@ -54,6 +61,14 @@ def platform_fee(item: dict, fees: dict) -> tuple[float, str]:
     fixed = fixed_fee(spec["fixed_fee_bands"], gross) if spec["fixed_fee_bands"] else 0.0
     total = commission + fixed
     label = f"{spec['commission_pct']:.0f}% ({commission:.2f}) + fixa ({fixed:.2f})"
+
+    # Envio protegido: so incide se o vendedor contratou o servico.
+    net_before = gross - total
+    if item.get("envio_protegido"):
+        ep = envio_protegido(net_before)
+        total += ep
+        label += f" + envio ({ep:.2f})"
+
     return total, label
 
 

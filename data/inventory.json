@@ -34,13 +34,13 @@
       "notes": "Vendida pelo Marketplace. Pix direto do comprador, valor cheio."
     },
     {
-      "id": "cafeteira-casaco",
-      "name": "Cafeteira Três Corações + casaco creme",
-      "category": "Eletrodoméstico / Vestuário",
-      "qty": 2,
-      "condition": "Usado",
-      "asking_price": 172,
-      "sold_price": 172,
+      "id": "cafeteira-tres-coracoes",
+      "name": "Cafeteira Três Corações",
+      "category": "Eletrodoméstico",
+      "qty": 1,
+      "condition": "Usada",
+      "asking_price": 158,
+      "sold_price": 158,
       "platform": "enjoei",
       "enjoei_mode": "classico",
       "status": "vendido",
@@ -48,10 +48,24 @@
       "delivery_cost": 0,
       "sold_at": null,
       "photos": [],
-      "notes": "Aguardando liberação do Enjoei.",
-      "open_questions": [
-        "Foi UMA venda de R$172 (cafeteira + casaco juntos) ou DUAS vendas separadas somando R$172? Se foram 2 produtos, o Enjoei aplica a tarifa fixa sobre a SOMA — mas a comissão incide por produto."
-      ]
+      "notes": "Venda SEPARADA do casaco (confirmado 25/09). Aguardando liberação do Enjoei."
+    },
+    {
+      "id": "casaco-creme",
+      "name": "Casaco creme",
+      "category": "Vestuário",
+      "qty": 1,
+      "condition": "Usado",
+      "asking_price": 50,
+      "sold_price": 50,
+      "platform": "enjoei",
+      "enjoei_mode": "classico",
+      "status": "vendido",
+      "payment_status": "pendente",
+      "delivery_cost": 0,
+      "sold_at": null,
+      "photos": [],
+      "notes": "Venda SEPARADA da cafeteira (confirmado 25/09). Aguardando liberação do Enjoei."
     },
     {
       "id": "mesa-cadeira",
@@ -68,11 +82,8 @@
       "delivery_cost": 0,
       "sold_at": null,
       "photos": [],
-      "notes": "Compradora pediu reembolso na plataforma logo após a compra. Alegou que precisaria devolver mesa e cadeira, mas não deu seguimento nem devolveu os itens. Pagamento travado — RISCO DE REVERSÃO total.",
-      "open_questions": [
-        "O Enjoei já decidiu algo sobre o reembolso, ou segue em análise?",
-        "Os itens continuam com a compradora ou voltaram?"
-      ]
+      "notes": "Compradora pediu reembolso logo após a compra. CONFIRMADO (25/09): os itens estão COM ELA. Aguardando posicionamento do Enjoei. Pagamento travado — RISCO DE REVERSÃO.",
+      "open_questions": ["O Enjoei já decidiu algo sobre o reembolso?"]
     },
     {
       "id": "livros-3-unidades",
@@ -125,14 +136,25 @@
       "photos": [],
       "net_received": 607.64,
       "net_received_confirmed": false,
-      "notes": "Igor informou de memória líquido de ~R$609. O cálculo pelo modo CLÁSSICO dá R$607,64 (comissão 12% = R$90 + tarifa fixa R$40 + envio protegido R$12,36), que bate. Se fosse turbinado (18%) daria R$552,64 — logo o anúncio é CLÁSSICO. CONFIRMAR no extrato do Enjoei."
+      "notes": "Líquido calculado R$607,64 (comissão 12% = R$90 + tarifa fixa R$40 + envio protegido R$12,36). Bate com os ~R$609 lembrados. CONFIRMAR no extrato do Enjoei.",
+      "open_questions": [
+        "Ano/modelo deste MacBook? Se também for Mid 2010, os R$750 foram bem acima do mercado."
+      ]
     },
     {
-      "id": "macbook-pro-tela-quebrada",
-      "name": "MacBook Pro — tela não funciona (só monitor externo)",
+      "id": "macbook-pro-2010-tela-quebrada",
+      "name": "MacBook Pro 13\" Mid 2010 — tela inoperante (funciona em monitor externo)",
       "category": "Eletrônico",
       "qty": 1,
-      "condition": "Usado, tela quebrada — funciona em monitor externo",
+      "condition": "Usado, tela inoperante — funciona em monitor externo",
+      "specs": {
+        "model": "MacBook Pro (13-inch, Mid 2010)",
+        "model_code": "MacBookPro7,1",
+        "cpu": "Intel Core 2 Duo 2,4 GHz",
+        "ram": "6 GB 1067 MHz DDR3 (pentes trocados — não é config de fábrica)",
+        "gpu": "NVIDIA GeForce 320M 256 MB",
+        "serial": "W8026S3DATM"
+      },
       "asking_price": 500,
       "sold_price": null,
       "platform": null,
@@ -142,11 +164,17 @@
       "delivery_cost": null,
       "sold_at": null,
       "photos": [],
-      "notes": "Anunciado por R$500. Interessados oferecendo R$400. Em negociação.",
-      "open_questions": [
-        "RAM informada como 6GB — MacBook Pro não tem 6GB. É 8GB? Confirmar antes de publicar.",
-        "Ano/modelo e tamanho de tela? Muda muito o preço justo."
-      ]
+      "market_research": {
+        "checked_at": "2026-09-25",
+        "findings": [
+          "Mercado Livre: Mid 2010 13\" funcionando (4GB/250GB) pedindo R$2.000 — preço de ANÚNCIO, não de venda efetivada",
+          "Mercado Livre: Mid 2010 13\" 2,4GHz que NÃO LIGA pedindo R$769,99",
+          "Referência internacional: ~US$100 para unidade funcionando"
+        ],
+        "assessment": "16 anos de idade, Core 2 Duo. O mercado real de venda é muito menor que os preços pedidos no ML. Com tela inoperante o valor justo cai para a faixa de R$200-400. A oferta de R$400 está no topo da faixa — recomendo aceitar."
+      },
+      "notes": "Anunciado por R$500, ofertas de R$400. Pesquisa sugere que R$400 é preço justo/a favor.",
+      "open_questions": ["Aceitar os R$400 e fechar?"]
     },
     {
       "id": "controles-xbox360",
