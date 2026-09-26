@@ -103,10 +103,10 @@ sem Google, sem intervenção do Hermes.
 
 ### Pendências (25/09)
 
-1. **Secrets do CI não configurados.** O workflow `.github/workflows/deploy.yml`
-   precisa de `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` em
-   Settings → Secrets → Actions. Sem eles o build+validação rodam mas o
-   deploy falha.
+1. ~~**Secrets do CI não configurados.**~~ **RESOLVIDO em 26/09.** `CLOUDFLARE_API_TOKEN`
+   e `CLOUDFLARE_ACCOUNT_ID` configurados via `gh secret set`. Workflow
+   `Build e deploy do catalogo` rodou verde (run 36240651088, deploy
+   `990c8ae8` publicado em produção). Salvar pelo admin agora rebuilda sozinho.
 2. **Fotos.** Todos os itens mostram "SEM FOTO". Colocar URLs em `photos[]`
    pelo admin.
 3. **Inventário incompleto.** Igor disse "há outras coisas, falo na sequência".
@@ -115,6 +115,8 @@ sem Google, sem intervenção do Hermes.
 5. **Pergunta aberta:** o Enjoei já travou o dinheiro da mesa em disputa, ou
    o valor foi recebido e ela abriu disputa depois? Muda o risco de
    R$224,90 para zero.
+6. **Canal de origem do MacBook 2010** (vendido R$400): Marketplace, OLX ou
+   grupo do condomínio? Só para medir qual canal converte melhor.
 
 ### MacBook 2010 (tela inoperante) — recomendação
 
