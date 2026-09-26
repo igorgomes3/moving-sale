@@ -98,8 +98,8 @@ sem Google, sem intervenção do Hermes.
 | Casaco creme | Enjoei | R$ 50,00 | R$ 12,50 | R$ 37,50 | a liberar |
 | 3 livros | Enjoei | R$ 50,00 | R$ 12,50 | R$ 37,50 | a liberar |
 
-- Já recebido: **R$ 450,00** · A liberar: **R$ 800,18** · Em disputa (risco): **R$ 224,90**
-- Potencial à venda: **R$ 950,00** · **Projeção total: R$ 2.425,08**
+- Já recebido: **R$ 850,00** · A liberar: **R$ 800,18** · Em disputa (risco): **R$ 224,90**
+- Potencial à venda: **R$ 450,00** · **Projeção total: R$ 2.325,08**
 
 ### Pendências (25/09)
 
