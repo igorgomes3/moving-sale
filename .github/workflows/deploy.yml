@@ -1,0 +1,54 @@
+name: Build e deploy do catalogo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'scripts/build.py'
+      - 'admin.html'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Gerar o site
+        run: python3 scripts/build.py
+
+      - name: Validar o build
+        run: |
+          test -f site/index.html || { echo "index.html nao gerado"; exit 1; }
+          python3 - <<'PY'
+          import json, re, sys
+          inv = json.load(open('data/inventory.json'))
+          html = open('site/index.html', encoding='utf-8').read()
+          n = len(inv['items'])
+          if 'ITEMS' in html and n == 0:
+              sys.exit('inventory vazio')
+          # todo item precisa aparecer no HTML embutido
+          for it in inv['items']:
+              if it['id'] not in html:
+                  sys.exit(f"item ausente no HTML: {it['id']}")
+          print(f"OK: {n} itens presentes no HTML")
+          PY
+
+      - name: Publicar no Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=moving-sale --branch=main
