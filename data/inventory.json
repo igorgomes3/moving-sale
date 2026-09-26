@@ -156,12 +156,12 @@
         "serial": "W8026S3DATM"
       },
       "asking_price": 500,
-      "sold_price": null,
-      "platform": null,
+      "sold_price": 400,
+      "platform": "outro",
       "enjoei_mode": null,
-      "status": "negociando",
-      "payment_status": null,
-      "delivery_cost": null,
+      "status": "vendido",
+      "payment_status": "recebido",
+      "delivery_cost": 0,
       "sold_at": null,
       "photos": [],
       "market_research": {
@@ -171,10 +171,12 @@
           "Mercado Livre: Mid 2010 13\" 2,4GHz que NÃO LIGA pedindo R$769,99",
           "Referência internacional: ~US$100 para unidade funcionando"
         ],
-        "assessment": "16 anos de idade, Core 2 Duo. O mercado real de venda é muito menor que os preços pedidos no ML. Com tela inoperante o valor justo cai para a faixa de R$200-400. A oferta de R$400 está no topo da faixa — recomendo aceitar."
+        "assessment": "16 anos de idade, Core 2 Duo. O mercado real de venda é muito menor que os preços pedidos no ML. Com tela inoperante o valor justo cai para a faixa de R$200-400. A oferta de R$400 estava no topo da faixa — fechou nesse valor, confirmando a estimativa."
       },
-      "notes": "Anunciado por R$500, ofertas de R$400. Pesquisa sugere que R$400 é preço justo/a favor.",
-      "open_questions": ["Aceitar os R$400 e fechar?"]
+      "notes": "VENDIDO por R$400 em Pix, comprador retirou na residência. Anunciado por R$500; fechou em R$400, exatamente o topo da faixa estimada pela pesquisa de mercado. Sem taxa de plataforma (transação direta).",
+      "open_questions": [
+        "Canal de origem: Marketplace, OLX ou grupo do condomínio? (só para saber qual canal converte melhor)"
+      ]
     },
     {
       "id": "controles-xbox360",
