@@ -6,6 +6,131 @@
 
 ---
 
+## 0. ESTADO ATUAL (2026-09-25) — LEIA PRIMEIRO
+
+### Está no ar
+
+- **Site:** https://moving-sale-c8b.pages.dev
+- **Admin:** https://moving-sale-c8b.pages.dev/admin.html
+- **Repo:** https://github.com/igorgomes3/moving-sale (público, branch `main`)
+
+Deploy verificado no domínio público com Chrome real: 11 cards, 7 vendidos,
+4 links `wa.me/5511949139458` (um por item à venda), **zero erros de console**.
+
+### Decisões travadas
+
+| Decisão | Valor | Rationale |
+|---|---|---|
+| Escopo | **Catálogo estático** | Sem carrinho/checkout/login. Liquidação one-time, não negócio. |
+| Fonte de verdade | **Git (`data/inventory.json`)** | Versionado, diffável, rollback por commit, zero dependência Google. |
+| Admin | `/admin.html` grava `inventory.json` via GitHub API | Auth por PAT no `localStorage`. Sem Google, sem planilha. |
+| Hospedagem | **Cloudflare Pages**, projeto `moving-sale` | Free tier, HTTPS, CDN. |
+| Contato | **WhatsApp `5511949139458`** | Autorizado por voz em 25/09. Link por item com mensagem pré-preenchida. |
+
+### Comandos
+
+```bash
+# gerar o site a partir do inventário
+cd /root/projects/moving-sale && python3 scripts/build.py
+
+# validar renderização local (precisa de um http.server na 8899)
+NODE_PATH=$(npm root -g) node scripts/validate.js
+
+# validar o site PUBLICADO (não precisa de server local)
+NODE_PATH=$(npm root -g) node scripts/validate-live.js
+
+# deploy manual
+export CLOUDFLARE_API_TOKEN=$(cat /root/.cf-token)
+npx --yes wrangler@latest pages deploy site --project-name=moving-sale --branch=main
+
+# transcrever áudio que o Hermes não transcreveu
+python3 scripts/stt.py /root/.hermes/cache/audio/audio_<hash>.ogg pt
+```
+
+### Estrutura
+
+```
+/root/projects/moving-sale/
+├── admin.html                    edita inventory.json via GitHub API
+├── data/
+│   ├── inventory.json            FONTE DE VERDADE (11 itens)
+│   └── fees.json                 tabelas oficiais Enjoei
+├── scripts/
+│   ├── build.py                  inventário -> site/ (HTML auto-contido)
+│   ├── calc.py                   calculadora de líquido/taxa
+│   ├── validate.js               valida no Chrome + screenshots
+│   ├── validate-live.js          valida o site publicado
+│   └── stt.py                    transcrição via 9Router
+├── .github/workflows/deploy.yml  CI: build + valida + deploy
+└── site/                         ARTEFATO DE BUILD (gitignored)
+```
+
+### Arquitetura final
+
+```
+data/inventory.json  (fonte de verdade, versionada)
+        │
+        ├─► scripts/build.py ─► site/index.html   (auto-contido, zero deps)
+        │                    ─► site/data/*.json  (admin lê same-origin)
+        │                    ─► site/copys.md     (rascunhos de anúncio)
+        │                    ─► site/resumo.md    (relatório financeiro)
+        │
+        └─► /admin.html ─► GitHub API (PUT contents) ─► commit
+                                    │
+                                    └─► GitHub Actions ─► build + valida ─► wrangler ─► Pages
+```
+
+**Fluxo do usuário:** abre `/admin.html` → edita campos → "Salvar tudo no
+GitHub" → commit → CI rebuilda → site atualizado em ~1-2 min. Sem planilha,
+sem Google, sem intervenção do Hermes.
+
+### Números (25/09/2026)
+
+**Vendido bruto: R$ 1.738,00 · Taxas: −R$ 262,92 (15,1%) · Líquido: R$ 1.475,08**
+
+| Item | Plataforma | Bruto | Taxa | Líquido | Situação |
+|---|---|---|---|---|---|
+| Secadora centrífuga | Marketplace | R$ 300,00 | 0 | R$ 300,00 | recebido |
+| Mesinha de centro | Marketplace | R$ 150,00 | 0 | R$ 150,00 | recebido |
+| MacBook Pro 16GB | Enjoei | R$ 750,00 | R$ 142,36 | R$ 607,64 | a liberar |
+| Mesa + cadeira | Enjoei | R$ 280,00 | R$ 55,10 | R$ 224,90 | **DISPUTA** |
+| Cafeteira Três Corações | Enjoei | R$ 158,00 | R$ 40,46 | R$ 117,54 | a liberar |
+| Casaco creme | Enjoei | R$ 50,00 | R$ 12,50 | R$ 37,50 | a liberar |
+| 3 livros | Enjoei | R$ 50,00 | R$ 12,50 | R$ 37,50 | a liberar |
+
+- Já recebido: **R$ 450,00** · A liberar: **R$ 800,18** · Em disputa (risco): **R$ 224,90**
+- Potencial à venda: **R$ 950,00** · **Projeção total: R$ 2.425,08**
+
+### Pendências (25/09)
+
+1. **Secrets do CI não configurados.** O workflow `.github/workflows/deploy.yml`
+   precisa de `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` em
+   Settings → Secrets → Actions. Sem eles o build+validação rodam mas o
+   deploy falha.
+2. **Fotos.** Todos os itens mostram "SEM FOTO". Colocar URLs em `photos[]`
+   pelo admin.
+3. **Inventário incompleto.** Igor disse "há outras coisas, falo na sequência".
+4. **Custos de deslocamento** dos itens de Marketplace ainda zerados —
+   corroem o líquido sem aparecer. Campo `delivery_cost` existe no admin.
+5. **Pergunta aberta:** o Enjoei já travou o dinheiro da mesa em disputa, ou
+   o valor foi recebido e ela abriu disputa depois? Muda o risco de
+   R$224,90 para zero.
+
+### MacBook 2010 (tela inoperante) — recomendação
+
+Pesquisa de mercado (25/09): ML pede R$2.000 num Mid 2010 funcionando e
+R$769,99 num que não liga — **preços de anúncio, não de venda efetivada**.
+Referência internacional: ~US$100 para unidade funcionando.
+
+Máquina de 16 anos, Core 2 Duo, tela morta → faixa justa **R$200-400**.
+A oferta de R$400 recebida está no topo da faixa. **Recomendação: aceitar.**
+
+Specs confirmadas: MacBookPro7,1, Core 2 Duo 2,4 GHz, 6 GB DDR3 (pentes
+trocados — não é config de fábrica), GeForce 320M, serial `W8026S3DATM`.
+
+---
+
+
 ## 1. Contexto real do projeto
 
 Igor + esposa vivem em **São Paulo, capital**, só os dois. Mudança planejada para **Da Nang, Vietnã — Mar/Abr 2027** (~6 meses). Já começaram a vender o que não vão levar.
@@ -154,4 +279,4 @@ Recomendo **Moving Sale**.
 | Skill Google Sheets | `google-sheets-pitfalls`, `google-workspace` |
 | Planilha financeira existente | RevCash: `1MmOasJn8RZ4281nd_lq-LylLQSDvAvQasFywlzsj_-I` (modelo de referência) |
 
-**Nota infra:** Supabase CLI instalado em `/usr/local/bin/supabase`; sem credenciais Cloudflare encontradas no `.env` — **verificar com Igor** antes de planejar o deploy (mas Cloudflare Pages free tier precisa só de conta).
+**Nota infra:** o token Cloudflare (`/root/.cf-token`) só tem permissão Pages — D1/KV/R2 retornam "Authentication error". Suficiente para este projeto. `yaml` NÃO existe no interpretador do `execute_code`; usar `terminal()` com o `python3` do sistema. Puppeteer está global: rodar com `NODE_PATH=$(npm root -g)`.
