@@ -47,7 +47,9 @@
       "payment_status": "pendente",
       "delivery_cost": 0,
       "sold_at": null,
-      "photos": [],
+      "photos": [
+        "img/cafeteira-tres-coracoes.jpg"
+      ],
       "notes": "Venda SEPARADA do casaco (confirmado 25/09). Aguardando liberação do Enjoei."
     },
     {
@@ -64,7 +66,9 @@
       "payment_status": "pendente",
       "delivery_cost": 0,
       "sold_at": null,
-      "photos": [],
+      "photos": [
+        "img/casaco-creme.jpg"
+      ],
       "notes": "Venda SEPARADA da cafeteira (confirmado 25/09). Aguardando liberação do Enjoei."
     },
     {
@@ -81,13 +85,17 @@
       "payment_status": "disputa",
       "delivery_cost": 0,
       "sold_at": null,
-      "photos": [],
+      "photos": [
+        "img/mesa-cadeira.jpg"
+      ],
       "notes": "Compradora pediu reembolso logo após a compra. CONFIRMADO (25/09): os itens estão COM ELA. Aguardando posicionamento do Enjoei. Pagamento travado — RISCO DE REVERSÃO.",
-      "open_questions": ["O Enjoei já decidiu algo sobre o reembolso?"]
+      "open_questions": [
+        "O Enjoei já decidiu algo sobre o reembolso?"
+      ]
     },
     {
       "id": "livros-3-unidades",
-      "name": "3 livros (pacote)",
+      "name": "Trilogia Millennium — 3 livros (pacote)",
       "category": "Livro",
       "qty": 3,
       "condition": "Usado",
@@ -99,7 +107,9 @@
       "payment_status": "pendente",
       "delivery_cost": 0,
       "sold_at": null,
-      "photos": [],
+      "photos": [
+        "img/livros-3-unidades.jpg"
+      ],
       "notes": "Comprador confirmou recebimento dos livros. Aguardando liberação do Enjoei."
     },
     {
@@ -133,7 +143,9 @@
       "payment_status": "pendente",
       "delivery_cost": 0,
       "sold_at": null,
-      "photos": [],
+      "photos": [
+        "img/macbook-pro-16gb.jpg"
+      ],
       "net_received": 607.64,
       "net_received_confirmed": false,
       "notes": "Líquido calculado R$607,64 (comissão 12% = R$90 + tarifa fixa R$40 + envio protegido R$12,36). Bate com os ~R$609 lembrados. CONFIRMAR no extrato do Enjoei.",
@@ -180,20 +192,50 @@
     },
     {
       "id": "controles-xbox360",
-      "name": "2 controles Xbox 360 + adaptador wireless para PC",
+      "name": "2 controles Xbox 360 + receptor wireless Microsoft original",
       "category": "Games",
       "qty": 1,
       "condition": "Usado, funcionando",
-      "asking_price": 200,
+      "asking_price": 210,
+      "sold_price": 150,
+      "platform": null,
+      "enjoei_mode": null,
+      "status": "vendido",
+      "payment_status": "pendente",
+      "delivery_cost": null,
+      "sold_at": null,
+      "photos": [
+        "img/controles-xbox360.jpg"
+      ],
+      "notes": "Kit gamer: 2 controles Xbox 360 + receptor wireless Microsoft original. Anunciado por R$210, comprador ofereceu R$150 e foi aceito. ENTREGA PENDENTE. CONFIRMAR a plataforma — muda a taxa: se foi Enjoei, comissão 12% (R$18) + tarifa fixa R$21,50 = R$39,50 (líquido R$110,50); se foi direto (Marketplace/OLX/grupo), líquido R$150.",
+      "open_questions": [
+        "Anunciado em qual plataforma? (Enjoei muda a taxa em R$39,50)",
+        "Custo de deslocamento até o comprador?"
+      ]
+    },
+    {
+      "id": "jaqueta-militar-verde-m",
+      "name": "Jaqueta militar verde feminina — tamanho M",
+      "category": "Vestuário",
+      "qty": 1,
+      "condition": "Usada",
+      "asking_price": null,
       "sold_price": null,
       "platform": null,
       "enjoei_mode": null,
-      "status": "a_venda",
+      "status": "vendido",
       "payment_status": null,
       "delivery_cost": null,
       "sold_at": null,
-      "photos": [],
-      "notes": "Pacote: 2 controles + adaptador wireless (necessário para funcionar no Windows). Anunciar como conjunto."
+      "photos": [
+        "img/jaqueta-militar-verde-m.jpg"
+      ],
+      "notes": "Vendida (informado em 26/09). Falta o VALOR e a plataforma para entrar nos totais.",
+      "open_questions": [
+        "Por quanto foi vendida?",
+        "Em qual plataforma?",
+        "Já recebeu?"
+      ]
     },
     {
       "id": "maquina-lavar-mini",
@@ -211,7 +253,9 @@
       "sold_at": null,
       "photos": [],
       "notes": "Porte pequeno.",
-      "open_questions": ["Capacidade em kg? (ajuda na copy do anúncio)"]
+      "open_questions": [
+        "Capacidade em kg? (ajuda na copy do anúncio)"
+      ]
     },
     {
       "id": "roupas",

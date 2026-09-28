@@ -449,6 +449,23 @@ def main() -> int:
         shutil.copy(admin_src, SITE / "admin.html")
     (SITE / ".nojekyll").write_text("", encoding="utf-8")
 
+    # copia as fotos versionadas de assets/img para site/img
+    assets_img = ROOT / "assets" / "img"
+    if assets_img.is_dir():
+        files = [p for p in assets_img.iterdir() if p.is_file()]
+        if files:
+            dest = SITE / "img"
+            dest.mkdir(parents=True, exist_ok=True)
+            for p in files:
+                shutil.copy2(p, dest / p.name)
+            print(f"    fotos: {len(files)} copiada(s) de assets/img/")
+
+    # avisa se algum item aponta para foto inexistente
+    for item in inv["items"]:
+        for rel in item.get("photos") or []:
+            if not (SITE / rel).exists():
+                print(f"    AVISO: {item['id']} aponta para {rel}, que nao existe", file=sys.stderr)
+
     print(f"OK  {len(inv['items'])} itens ({t['sold_count']} vendidos)")
     print(f"    liquido {brl(t['net'])} | potencial {brl(t['potential'])} | projecao {brl(t['projection'])}")
     print(f"    site/ -> index.html, admin.html, data/, copys.md, resumo.md")
