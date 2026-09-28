@@ -18,10 +18,12 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -169,6 +171,9 @@ h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;line-height:1.15}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:18px;align-items:stretch}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:.18s}
 .card:hover{border-color:#3a4250;transform:translateY(-2px)}
+.cardlink{display:block;text-decoration:none;color:inherit}
+.namelink{text-decoration:none;color:inherit}
+.namelink:hover .name{color:var(--accent)}
 .ph{aspect-ratio:16/10;max-height:210px;background:linear-gradient(135deg,#1f242d,#252b36);display:flex;align-items:center;justify-content:center;color:#8a93a6;font-size:13px;position:relative;overflow:hidden}
 .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .nofoto{color:#8a93a6;font-size:12.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
@@ -195,6 +200,8 @@ h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;line-height:1.15}
 .cta:hover{background:var(--accent2)}
 .cta.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);cursor:default}
 .cta.ghost:hover{background:transparent}
+.cta.link{background:transparent;border:1px solid var(--line);color:var(--txt);margin-top:8px}
+.cta.link:hover{background:var(--card2);border-color:#3a4250}
 .empty{text-align:center;color:var(--dim);padding:70px 20px}
 footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);color:var(--dim);font-size:13.5px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer a{color:var(--dim)}
@@ -253,14 +260,17 @@ function card(i){
   const note = (!sold && i.notes) ? '<div class="notes">' + esc(i.notes) + '</div>' : '';
 
   return '<article class="card ' + (sold?'sold':'') + '" id="item-' + esc(i.id) + '" data-status="' + i.status + '">'
+    + '<a class="cardlink" href="item/' + esc(i.id) + '.html" aria-label="Ver ' + esc(i.name) + '">'
     + '<div class="ph">' + photo + '<div class="badges"><span class="badge b-' + i.status + '">' + esc(i.status_label) + '</span></div></div>'
+    + '</a>'
     + '<div class="body">'
     +   '<div class="cat">' + esc(i.category) + (i.qty && i.qty > 1 ? ' · ' + i.qty + ' itens' : '') + '</div>'
-    +   '<div class="name">' + esc(i.name) + '</div>'
+    +   '<a class="namelink" href="item/' + esc(i.id) + '.html"><div class="name">' + esc(i.name) + '</div></a>'
     +   (i.condition ? '<div class="cond">' + esc(i.condition) + '</div>' : '')
     +   specs + note
     +   priceHtml
     +   cta
+    +   '<a class="cta link" href="item/' + esc(i.id) + '.html">Ver detalhes e compartilhar</a>'
     + '</div></article>';
 }
 
@@ -337,6 +347,175 @@ def build_index(inv: dict, fees: dict, t: dict) -> str:
 </script>
 </body>
 </html>
+"""
+
+
+def build_item_pages(inv: dict, fees: dict, t: dict) -> int:
+    """Gera site/item/<id>.html — uma pagina por item, com OG tags para
+    preview no WhatsApp. O link e o que o Igor compartilha."""
+    meta = inv["meta"]
+    base = (meta.get("base_url") or "").rstrip("/")
+    wa = meta.get("whatsapp") or ""
+    out_dir = SITE / "item"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    count = 0
+
+    for item in inv["items"]:
+        sold = item.get("status") == "vendido"
+        price = item.get("sold_price") if sold else item.get("asking_price")
+        price_txt = brl(price) if price is not None else "Preço a definir"
+
+        title = item["name"]
+        if not sold and price is not None:
+            title = f"{item['name']} — {price_txt}"
+
+        # foto para o preview
+        og_img = ""
+        if item.get("photos"):
+            rel = item["photos"][0]
+            og_img = f"{base}/{rel}" if base else rel
+
+        desc_bits = [b for b in (item.get("condition"), item.get("category")) if b]
+        if sold:
+            desc = "Vendido. " + " · ".join(desc_bits)
+        else:
+            desc = f"{price_txt} · " + " · ".join(desc_bits)
+        desc += ". Retirada em São Paulo."
+
+        status_label = STATUS_LABEL.get(item.get("status"), item.get("status"))
+
+        # galeria
+        photos = item.get("photos") or []
+        if photos:
+            gallery = "".join(
+                f'<img src="../{esc(p)}" alt="{esc(item["name"])}" loading="lazy">'
+                for p in photos
+            )
+        else:
+            gallery = '<div class="ph big"><span class="nofoto">sem foto</span></div>'
+
+        # specs
+        specs_html = ""
+        if item.get("specs"):
+            rows = "".join(
+                f'<div class="kv"><span class="k">{esc(k)}</span><span class="v">{esc(v)}</span></div>'
+                for k, v in item["specs"].items()
+            )
+            specs_html = f'<div class="panel"><h2>Especificações</h2>{rows}</div>'
+
+        # CTA
+        if sold:
+            cta = f'<div class="cta ghost big">{esc("já foi" if item.get("payment_status") != "disputa" else "em disputa")}</div>'
+        elif wa:
+            link = ("https://wa.me/" + re.sub(r"\D", "", wa)
+                    + "?text=" + quote(meta.get("whatsapp_message", "").replace("{item}", item["name"])))
+            cta = f'<a class="cta big" href="{esc(link)}" target="_blank" rel="noopener">Tenho interesse</a>'
+        else:
+            cta = '<div class="cta ghost big">chamar no WhatsApp</div>'
+
+        notes_html = ""
+        if item.get("notes"):
+            notes_html = f'<div class="panel"><h2>Sobre o item</h2><p class="body">{esc(item["notes"])}</p></div>'
+
+        back = "index.html" if not base else "index.html"
+
+        page = f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="{'noindex' if sold else 'index,follow'}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%B7%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>{esc(title)}</title>
+<meta name="description" content="{esc(desc)}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{esc(title)}">
+<meta property="og:description" content="{esc(desc)}">
+<meta property="og:url" content="{esc(base)}/item/{esc(item['id'])}.html">
+{'<meta property="og:image" content="' + esc(og_img) + '">' if og_img else ''}
+<meta name="twitter:card" content="summary_large_image">
+<style>{CSS}{ITEM_CSS}</style>
+</head>
+<body>
+<div class="wrap narrow">
+  <a class="back" href="../{back}">← voltar ao catálogo</a>
+
+  <div class="gal">
+    {gallery}
+  </div>
+
+  <div class="hd-row">
+    <span class="badge b-{esc(item.get('status',''))}">{esc(status_label)}</span>
+    <span class="cat">{esc(item.get('category') or '')}</span>
+  </div>
+
+  <h1 class="item-h1">{esc(item['name'])}</h1>
+  {f'<p class="cond">{esc(item["condition"])}</p>' if item.get("condition") else ''}
+
+  <div class="price-big">
+    <span class="now">{esc(price_txt)}</span>
+    {f'<span class="lbl">{esc("vendido por") if sold else ("em negociação" if item.get("status") == "negociando" else "à vista")}</span>'}
+  </div>
+
+  {cta}
+
+  {specs_html}
+  {notes_html}
+
+  <div class="share">
+    <button class="cta ghost" id="btnShare" data-url="{esc(base)}/item/{esc(item['id'])}.html">Copiar link deste item</button>
+  </div>
+
+  <footer>
+    <span>{esc(inv['meta'].get('title','') or '')}</span>
+    <span><a href="../index.html">ver todos os {len(inv['items'])} itens</a></span>
+  </footer>
+</div>
+<script>
+document.getElementById('btnShare').addEventListener('click', function(){{
+  var url = this.dataset.url;
+  var b = this;
+  var done = function(){{ b.textContent = 'Link copiado!'; setTimeout(function(){{ b.textContent='Copiar link deste item'; }}, 1500); }};
+  if (navigator.share) {{ navigator.share({{title: document.title, url: url}}).then(done).catch(function(){{}}); }}
+  else if (navigator.clipboard) {{ navigator.clipboard.writeText(url).then(done).catch(function(){{ prompt('Copie o link:', url); }}); }}
+  else {{ prompt('Copie o link:', url); }}
+}});
+</script>
+</body>
+</html>
+"""
+        (out_dir / f"{item['id']}.html").write_text(page, encoding="utf-8")
+        count += 1
+
+    return count
+
+
+ITEM_CSS = """
+.wrap.narrow{max-width:820px}
+.back{display:inline-block;color:var(--dim);text-decoration:none;font-size:14px;margin-bottom:18px}
+.back:hover{color:var(--txt)}
+.gal{display:grid;gap:10px;margin-bottom:20px}
+.gal img{width:100%;border-radius:var(--radius);display:block;background:var(--card2)}
+.gal img:first-child{max-height:520px;object-fit:cover}
+.gal:has(img:nth-child(2)){grid-template-columns:1fr 1fr}
+.gal:has(img:nth-child(2)) img:first-child{grid-column:1/-1;max-height:420px}
+.ph.big{aspect-ratio:16/10;max-height:420px;background:linear-gradient(135deg,#1f242d,#252b36);display:flex;align-items:center;justify-content:center;border-radius:var(--radius)}
+.hd-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.item-h1{font-size:clamp(22px,3.4vw,32px);letter-spacing:-.02em;line-height:1.2}
+.cond{color:var(--dim);margin-top:6px;font-size:15px}
+.price-big{margin:18px 0 16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.price-big .now{font-size:34px;font-weight:750;letter-spacing:-.02em}
+.price-big .lbl{color:var(--dim);font-size:14px}
+.cta.big{font-size:16.5px;padding:15px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:16px}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);margin-bottom:12px}
+.panel .body{color:var(--txt);font-size:15px;line-height:1.6}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--dim);text-transform:capitalize;flex-shrink:0}
+.kv .v{text-align:right}
+.share{margin-top:18px}
+@media(max-width:520px){.gal:has(img:nth-child(2)){grid-template-columns:1fr}.price-big .now{font-size:28px}}
 """
 
 
@@ -439,6 +618,7 @@ def main() -> int:
     (SITE / "data").mkdir(parents=True, exist_ok=True)
 
     (SITE / "index.html").write_text(build_index(inv, fees, t), encoding="utf-8")
+    n_items = build_item_pages(inv, fees, t)
     (SITE / "data" / "inventory.json").write_text(json.dumps(inv, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "data" / "fees.json").write_text(json.dumps(fees, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "copys.md").write_text(build_copys(inv), encoding="utf-8")
@@ -468,7 +648,7 @@ def main() -> int:
 
     print(f"OK  {len(inv['items'])} itens ({t['sold_count']} vendidos)")
     print(f"    liquido {brl(t['net'])} | potencial {brl(t['potential'])} | projecao {brl(t['projection'])}")
-    print(f"    site/ -> index.html, admin.html, data/, copys.md, resumo.md")
+    print(f"    site/ -> index.html + {n_items} pagina(s) de item + admin.html + data/ + copys.md")
     return 0
 
 

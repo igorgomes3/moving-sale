@@ -4,6 +4,7 @@
     "updated_at": "2026-09-25T00:00:00Z",
     "whatsapp": "5511949139458",
     "whatsapp_message": "Oi! Vi o item \"{item}\" no catálogo. Ainda está disponível?",
+    "base_url": "https://moving-sale-c8b.pages.dev",
     "title": "Desapego — apê em SP",
     "subtitle": "Itens usados, preço de amigo. Retirada em São Paulo.",
     "goal_total": null,
@@ -198,19 +199,18 @@
       "condition": "Usado, funcionando",
       "asking_price": 210,
       "sold_price": 150,
-      "platform": null,
-      "enjoei_mode": null,
+      "platform": "enjoei",
+      "enjoei_mode": "classico",
       "status": "vendido",
       "payment_status": "pendente",
-      "delivery_cost": null,
+      "delivery_cost": 0,
       "sold_at": null,
       "photos": [
         "img/controles-xbox360.jpg"
       ],
-      "notes": "Kit gamer: 2 controles Xbox 360 + receptor wireless Microsoft original. Anunciado por R$210, comprador ofereceu R$150 e foi aceito. ENTREGA PENDENTE. CONFIRMAR a plataforma — muda a taxa: se foi Enjoei, comissão 12% (R$18) + tarifa fixa R$21,50 = R$39,50 (líquido R$110,50); se foi direto (Marketplace/OLX/grupo), líquido R$150.",
+      "notes": "Kit gamer: 2 controles Xbox 360 + receptor wireless Microsoft original. Anunciado por R$210 na Enjoei, comprador ofereceu R$150 e foi aceito. Taxa Enjoei (faixa até R$150): comissão 12% = R$18,00 + tarifa fixa R$12,50 = R$30,50. Líquido R$119,50. ENTREGA PENDENTE.",
       "open_questions": [
-        "Anunciado em qual plataforma? (Enjoei muda a taxa em R$39,50)",
-        "Custo de deslocamento até o comprador?"
+        "Custo de deslocamento/entrega até o comprador?"
       ]
     },
     {
@@ -219,22 +219,20 @@
       "category": "Vestuário",
       "qty": 1,
       "condition": "Usada",
-      "asking_price": null,
-      "sold_price": null,
-      "platform": null,
-      "enjoei_mode": null,
+      "asking_price": 50,
+      "sold_price": 50,
+      "platform": "enjoei",
+      "enjoei_mode": "classico",
       "status": "vendido",
-      "payment_status": null,
-      "delivery_cost": null,
+      "payment_status": "pendente",
+      "delivery_cost": 0,
       "sold_at": null,
       "photos": [
         "img/jaqueta-militar-verde-m.jpg"
       ],
-      "notes": "Vendida (informado em 26/09). Falta o VALOR e a plataforma para entrar nos totais.",
+      "notes": "Vendida por R$50 na Enjoei (informado 26/09). Taxa Enjoei (faixa até R$50): comissão 12% = R$6,00 + tarifa fixa R$6,50 = R$12,50. Líquido R$37,50. CONFIRMAR plataforma no extrato — assumido Enjoei por ser o canal das roupas.",
       "open_questions": [
-        "Por quanto foi vendida?",
-        "Em qual plataforma?",
-        "Já recebeu?"
+        "Confirmar no extrato do Enjoei que o líquido foi R$37,50"
       ]
     },
     {
