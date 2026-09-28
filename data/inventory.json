@@ -5,8 +5,9 @@
     "whatsapp": "5511949139458",
     "whatsapp_message": "Oi! Vi o item \"{item}\" no catálogo. Ainda está disponível?",
     "base_url": "https://moving-sale-c8b.pages.dev",
-    "title": "Desapego — apê em SP",
-    "subtitle": "Itens usados, preço de amigo. Retirada em São Paulo.",
+    "title": "Desapego",
+    "subtitle": "Itens usados em bom estado",
+    "seller_name": "Igor",
     "goal_total": null,
     "notes": "FONTE DE VERDADE do catálogo. Editado pela página /admin.html. NÃO editar à mão sem rodar o build.",
     "field_help": {
