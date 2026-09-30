@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import quote
 
+import dashboard
 import theme
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -508,6 +509,10 @@ def main() -> int:
     (SITE / "data" / "fees.json").write_text(json.dumps(fees, ensure_ascii=False, indent=2), encoding="utf-8")
     (SITE / "copys.md").write_text(build_copys(inv), encoding="utf-8")
     (SITE / "resumo.md").write_text(build_resumo(inv, fees, t), encoding="utf-8")
+
+    # painel privado do vendedor (nao linkado do publico)
+    (SITE / "dashboard.html").write_text(
+        dashboard.render(inv, fees, t, item_fee), encoding="utf-8")
 
     admin_src = ROOT / "admin.html"
     if admin_src.exists():
