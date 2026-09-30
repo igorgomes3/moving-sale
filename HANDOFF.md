@@ -10,12 +10,42 @@
 
 ### Está no ar
 
-- **Site:** https://moving-sale-c8b.pages.dev
-- **Admin:** https://moving-sale-c8b.pages.dev/admin.html
+- **Site público:** https://moving-sale-c8b.pages.dev
+- **Painel privado:** https://moving-sale-c8b.pages.dev/dashboard.html
+- **Admin (editar itens):** https://moving-sale-c8b.pages.dev/admin.html
 - **Repo:** https://github.com/igorgomes3/moving-sale (público, branch `main`)
 
-Deploy verificado no domínio público com Chrome real: 11 cards, 7 vendidos,
-4 links `wa.me/5511949139458` (um por item à venda), **zero erros de console**.
+Deploy automatizado por GitHub Actions (secrets configurados): push em
+`data/**`, `scripts/**`, `assets/**` ou `admin.html` → build → valida →
+publica. O CI **falha** se encontrar dado financeiro na área pública.
+
+### Três camadas, propósitos opostos
+
+| Camada | Arquivo | Público? | Conteúdo |
+|---|---|---|---|
+| Catálogo | `index.html` + `item/*.html` | **Sim** | Nome, foto, preço pedido, contato. Nada mais. |
+| Painel | `dashboard.html` | Não (URL secreta) | Bruto, taxa, líquido, disputa, pendências |
+| Admin | `admin.html` | Não (token GitHub) | Edição do inventário |
+
+**Regra inviolável:** a área pública nunca expõe preço de item **vendido**,
+plataforma de venda, taxa, líquido, disputa ou total arrecadado. `public_items()`
+em `build.py` usa **allowlist** de campos — o JSON embutido no HTML também é
+filtrado. Validado por varredura automática no CI e em `validate-public.js`.
+
+### ⚠️ Segurança do painel — limitação conhecida
+
+`dashboard.html` **não é autenticado**. Tem `noindex,nofollow` e não é linkado
+do público, mas quem souber a URL vê os números. Pior: a fonte de verdade
+`data/inventory.json` está no **repo público do GitHub**, então os valores já
+são legíveis lá também.
+
+Para sigilo real, escolher um:
+1. **Tornar o repo privado** — Cloudflare Pages passa a servir apenas o build
+   (o site continua público, os dados saem do alcance). Caminho mais simples.
+2. Mover os dados financeiros para fora do repo (D1, KV ou arquivo local).
+3. Cloudflare Access na rota `/dashboard.html` (exige plano/config extra).
+
+Nenhuma dessas foi feita ainda — decisão pendente do Igor.
 
 ### Decisões travadas
 
