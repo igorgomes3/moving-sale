@@ -5,7 +5,8 @@ on:
     branches: [main]
     paths:
       - 'data/**'
-      - 'scripts/build.py'
+      - 'scripts/**'
+      - 'assets/**'
       - 'admin.html'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
@@ -32,18 +33,42 @@ jobs:
       - name: Validar o build
         run: |
           test -f site/index.html || { echo "index.html nao gerado"; exit 1; }
+          test -f site/dashboard.html || { echo "dashboard.html nao gerado"; exit 1; }
           python3 - <<'PY'
-          import json, re, sys
+          import json, re, sys, pathlib
           inv = json.load(open('data/inventory.json'))
           html = open('site/index.html', encoding='utf-8').read()
           n = len(inv['items'])
-          if 'ITEMS' in html and n == 0:
+          if n == 0:
               sys.exit('inventory vazio')
-          # todo item precisa aparecer no HTML embutido
           for it in inv['items']:
               if it['id'] not in html:
                   sys.exit(f"item ausente no HTML: {it['id']}")
-          print(f"OK: {n} itens presentes no HTML")
+
+          # a area publica NAO pode expor dado financeiro nem plataforma
+          PROIBIDO = [
+              r'[Ee]njoei', r'Mercado ?[Ll]ivre', r'\bOLX\b', r'\btaxa\b',
+              r'disputa', r'l[íi]quido', r'arrecadad', r'a liberar',
+              r'net_received', r'enjoei_mode', r'open_questions',
+              r'market_research', r'delivery_cost',
+          ]
+          paginas = ['site/index.html'] + [
+              str(p) for p in pathlib.Path('site/item').glob('*.html')
+          ]
+          vazios = []
+          for f in paginas:
+              txt = open(f, encoding='utf-8').read()
+              for rx in PROIBIDO:
+                  if re.search(rx, txt):
+                      vazios.append(f"{f}: {rx}")
+          if vazios:
+              sys.exit("VAZAMENTO na area publica:\n" + "\n".join(vazios))
+
+          # o publico nao pode linkar o painel privado
+          if 'dashboard' in html:
+              sys.exit('o index publico linka o dashboard privado')
+
+          print(f"OK: {n} itens no HTML, {len(paginas)} paginas publicas sem vazamento")
           PY
 
       - name: Publicar no Cloudflare Pages
