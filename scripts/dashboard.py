@@ -19,7 +19,7 @@ financeiros para fora do repo. Sinalizado no HANDOFF.
 from __future__ import annotations
 
 import html
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import theme
 
@@ -148,7 +148,7 @@ tr.is-dispute td:nth-child(5) b{color:var(--risk)}
 
 footer.site{border-top:1px solid var(--line);background:var(--card);padding:18px 0;color:var(--dim);font-size:12.5px;margin-top:auto}
 footer.site .inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.lockrow{display:flex;align-items:center;gap:7px}
+.lockrow{font-weight:600}
 
 @media(max-width:900px){.cols{grid-template-columns:1fr}}
 @media(max-width:680px){
@@ -166,6 +166,13 @@ def brl(v) -> str:
     if v is None:
         return "—"
     return f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def pl(n: int, singular: str, plural: str | None = None) -> str:
+    """Pluralizacao de verdade. Nao usar 'item(ns)'."""
+    if n == 1:
+        return f"{n} {singular}"
+    return f"{n} {plural or singular + 's'}"
 
 
 def neg(v) -> str:
@@ -205,8 +212,8 @@ def build_pendencias(inv: dict, fees, item_fee, t: dict) -> list[dict]:
     if unconf:
         out.append({
             "urgent": False,
-            "txt": f"Confirmar no extrato o líquido de {len(unconf)} venda(s)",
-            "sub": "Cálculo assume modo clássico do Enjoei — validar valor recebido",
+            "txt": f"Confirmar no extrato o líquido de {pl(len(unconf), 'venda')}",
+            "sub": "Único item sem valor de extrato. Fórmula já validada nos outros 5 casos",
         })
 
     # 3. custo de entrega nao lancado
@@ -216,7 +223,7 @@ def build_pendencias(inv: dict, fees, item_fee, t: dict) -> list[dict]:
     if nod:
         out.append({
             "urgent": False,
-            "txt": f"Lançar custo de deslocamento de {len(nod)} entrega(s)",
+            "txt": f"Lançar custo de deslocamento de {pl(len(nod), 'entrega')}",
             "sub": "Venda direta paga valor cheio: o custo é o deslocamento, e ele não aparece no líquido",
         })
 
@@ -225,7 +232,7 @@ def build_pendencias(inv: dict, fees, item_fee, t: dict) -> list[dict]:
     if nofoto:
         out.append({
             "urgent": False,
-            "txt": f"Enviar fotos de {len(nofoto)} item(ns) sem foto",
+            "txt": f"Enviar fotos de {pl(len(nofoto), 'item', 'itens')} sem foto",
             "sub": ", ".join(i["name"] for i in nofoto[:3]) + ("..." if len(nofoto) > 3 else ""),
         })
 
@@ -234,7 +241,7 @@ def build_pendencias(inv: dict, fees, item_fee, t: dict) -> list[dict]:
     if oq:
         out.append({
             "urgent": False,
-            "txt": f"Responder {len(oq)} pergunta(s) em aberto no inventário",
+            "txt": f"Responder {pl(len(oq), 'pergunta')} em aberto no inventário",
             "sub": "; ".join(q for _, q in oq[:2]) + ("..." if len(oq) > 2 else ""),
         })
 
@@ -243,7 +250,7 @@ def build_pendencias(inv: dict, fees, item_fee, t: dict) -> list[dict]:
     if semp:
         out.append({
             "urgent": False,
-            "txt": f"Definir preço de {len(semp)} item(ns) à venda",
+            "txt": f"Definir preço de {pl(len(semp), 'item', 'itens')} à venda",
             "sub": ", ".join(i["name"] for i in semp),
         })
 
@@ -285,8 +292,14 @@ def render(inv: dict, fees, t: dict, item_fee) -> str:
         ("Líquido recebido", t["received"], "já no bolso", "is-ok"),
         ("A liberar", t["pending"], "aguardando as plataformas", "is-warn"),
         ("Em disputa", t["dispute"], "risco de reversão", "is-risk"),
-        ("Ainda à venda", t["potential"], "potencial restante", ""),
     ]
+    # 4o KPI e adaptativo: se ainda ha estoque, mostra o potencial; se tudo
+    # foi vendido, mostra o peso das taxas (mais util que um R$ 0,00 morto)
+    if t["potential"]:
+        kpis.append(("Ainda à venda", t["potential"], "potencial restante", ""))
+    else:
+        kpis.append(("Taxas pagas", t["fees"],
+                     f"{fee_pct:.1f}% do bruto — tudo vendido", "is-warn"))
     kpi_html = "".join(
         f'<div class="kpi {cls}"><div class="k">{esc(k)}</div>'
         f'<div class="v">{brl(v)}</div><div class="n">{esc(n)}</div></div>'
@@ -307,18 +320,40 @@ def render(inv: dict, fees, t: dict, item_fee) -> str:
         f'{"" if i.get("photos") else " · sem foto"}</div></div>'
         f'<div class="pr">{brl(i.get("asking_price")) if i.get("asking_price") is not None else "a combinar"}</div></li>'
         for i in live
-    ) or '<li><div class="nm">Nenhum item à venda.</div></li>'
+    )
 
-    # projecao: se o que esta a venda vender pelo preco pedido, sem taxa
-    proj = t["net"] + t["potential"]
-    tip = ""
-    if live and t["potential"]:
-        tip = (f'<div class="tip"><b>Estratégia:</b> fechando os {len(live)} itens restantes '
-               f'por {brl(t["potential"])} em venda direta (sem taxa), o líquido acumulado '
-               f'passa de <b>{brl(t["net"])}</b> para <b>{brl(proj)}</b>.</div>')
+    if live:
+        sell_block = f'<ul class="selllist">{sell_html}</ul>'
+        # projecao: se o que esta a venda vender pelo preco pedido, sem taxa
+        if t["potential"]:
+            proj = t["net"] + t["potential"]
+            sell_block += (f'<div class="tip"><b>Estratégia:</b> fechando os {len(live)} itens restantes '
+                           f'por {brl(t["potential"])} em venda direta (sem taxa), o líquido acumulado '
+                           f'passa de <b>{brl(t["net"])}</b> para <b>{brl(proj)}</b>.</div>')
+    else:
+        # nada a venda: mostra de onde veio o dinheiro
+        by_plat: dict[str, list[float]] = {}
+        for i in sold:
+            k = PLATFORM_LABEL.get(i.get("platform") or "", "—")
+            by_plat.setdefault(k, []).append(i.get("sold_price") or 0)
+        items_plat = "".join(
+            f'<li><div><div class="nm">{esc(k)}</div>'
+            f'<div class="sub">{pl(len(v), "venda")} · {brl(sum(v))} bruto</div></div>'
+            f'<div class="pr">{brl(sum(v) - sum(item_fee(i, fees) for i in sold if PLATFORM_LABEL.get(i.get("platform") or "", "—") == k))}</div></li>'
+            for k, v in sorted(by_plat.items(), key=lambda kv: -sum(kv[1]))
+        )
+        sell_block = f'<ul class="selllist">{items_plat}</ul>'
+        n_disp = len([i for i in sold if i.get("payment_status") == "disputa"])
+        fecho = "Todos os itens foram vendidos."
+        if n_disp:
+            fecho = (f"Todos os itens foram vendidos, mas {pl(n_disp, 'item')} "
+                     "segue em disputa — esse valor pode reverter.")
+        sell_block += (f'<div class="tip"><b>{"Desapego concluído" if not n_disp else "Atenção"}:</b> '
+                       f'{fecho} O que resta é receber o que as plataformas ainda seguram.</div>')
 
-    agora = datetime.now(timezone.utc)
-    ts = agora.strftime("%d/%m/%Y %H:%M UTC")
+    # fuso do Igor (UTC-3): o painel e de uso pessoal, horario local faz sentido
+    agora = datetime.now(timezone.utc) - timedelta(hours=3)
+    ts = agora.strftime("%d/%m/%Y às %H:%M")
 
     return f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -367,8 +402,8 @@ def render(inv: dict, fees, t: dict, item_fee) -> str:
 
   <section class="card" id="itens">
     <header>
-      <h2>Itens vendidos</h2>
-      <span class="meta">{len(sold)} transações · {len([i for i in sold if i.get('payment_status') == 'recebido'])} recebidos · {len([i for i in sold if i.get('payment_status') == 'pendente'])} a liberar · {len([i for i in sold if i.get('payment_status') == 'disputa'])} em disputa</span>
+      <h2>{pl(len(sold), 'item vendido', 'itens vendidos')}</h2>
+      <span class="meta">{pl(len(sold), 'transação', 'transações')} · {len([i for i in sold if i.get('payment_status') == 'recebido'])} recebidos · {len([i for i in sold if i.get('payment_status') == 'pendente'])} a liberar · {len([i for i in sold if i.get('payment_status') == 'disputa'])} em disputa</span>
     </header>
     <div class="tblwrap">
       <table>
@@ -400,19 +435,18 @@ def render(inv: dict, fees, t: dict, item_fee) -> str:
     <section class="card" id="pendencias">
       <header>
         <h2>Pendências</h2>
-        <span class="meta">{len(pend)} a fazer</span>
+        <span class="meta">{pl(len(pend), 'a fazer', 'a fazer')}</span>
       </header>
       <div class="pad"><ul class="todo">{pend_html}</ul></div>
     </section>
 
     <section class="card">
       <header>
-        <h2>Ainda à venda</h2>
-        <span class="meta">{len(live)} item(ns)</span>
+        <h2>{'Ainda à venda' if live else 'De onde veio'}</h2>
+        <span class="meta">{pl(len(live), 'item', 'itens') if live else pl(len(sold), 'venda')}</span>
       </header>
       <div class="pad">
-        <ul class="selllist">{sell_html}</ul>
-        {tip}
+        {sell_block}
       </div>
     </section>
   </div>
@@ -422,7 +456,7 @@ def render(inv: dict, fees, t: dict, item_fee) -> str:
 
 <footer class="site">
   <div class="inner">
-    <span class="lockrow">🔒 Dados privados — não compartilhar</span>
+    <span class="lockrow">Dados privados — não compartilhar</span>
     <span>Atualizado {ts}</span>
   </div>
 </footer>

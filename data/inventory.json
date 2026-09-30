@@ -1,7 +1,7 @@
 {
   "meta": {
     "currency": "BRL",
-    "updated_at": "2026-09-25T00:00:00Z",
+    "updated_at": "2026-09-30T00:00:00Z",
     "whatsapp": "5511949139458",
     "whatsapp_message": "Oi! Vi o item \"{item}\" no catálogo. Ainda está disponível?",
     "base_url": "https://moving-sale-c8b.pages.dev",
@@ -37,12 +37,12 @@
     },
     {
       "id": "cafeteira-tres-coracoes",
-      "name": "Cafeteira Três Corações",
+      "name": "Cafeteira Três Corações vermelha",
       "category": "Eletrodoméstico",
       "qty": 1,
       "condition": "Usada",
       "asking_price": 158,
-      "sold_price": 158,
+      "sold_price": 169.0,
       "platform": "enjoei",
       "enjoei_mode": "classico",
       "status": "vendido",
@@ -52,18 +52,19 @@
       "photos": [
         "img/cafeteira-tres-coracoes.jpg"
       ],
-      "notes": "Venda SEPARADA do casaco (confirmado 25/09). Aguardando liberação do Enjoei."
+      "notes": "Extrato Enjoei (confirmado 30/09): vendido R$169,00 - comissão R$20,28 - tarifa fixa R$21,50 - envio protegido R$3,01 = R$124,21. O valor de venda é R$169,00 (antes eu tinha R$158,00 por informação anterior).",
+      "net_received": 124.21,
+      "envio_protegido": true
     },
     {
       "id": "casaco-creme",
-      "name": "Casaco creme",
+      "name": "Casaco bege Shein — P",
       "category": "Vestuário",
       "qty": 1,
       "condition": "Usado",
       "asking_price": 50,
-      "sold_price": 50,
+      "sold_price": 50.0,
       "platform": "enjoei",
-      "enjoei_mode": "classico",
       "status": "vendido",
       "payment_status": "pendente",
       "delivery_cost": 0,
@@ -71,7 +72,9 @@
       "photos": [
         "img/casaco-creme.jpg"
       ],
-      "notes": "Venda SEPARADA da cafeteira (confirmado 25/09). Aguardando liberação do Enjoei."
+      "notes": "Extrato Enjoei (confirmado 30/09): vendido R$50,00, SEM comissão e SEM tarifa fixa. Único desconto: envio protegido R$1,86. Líquido R$48,14. Sem comissão é incomum no Enjoei — provável modo grátis, mas o valor confirmado é o que vale.",
+      "net_received": 48.14,
+      "envio_protegido": true
     },
     {
       "id": "mesa-cadeira",
@@ -112,7 +115,9 @@
       "photos": [
         "img/livros-3-unidades.jpg"
       ],
-      "notes": "Comprador confirmou recebimento dos livros. Aguardando liberação do Enjoei."
+      "notes": "Venda Enjoei. Ainda NAO confirmada no extrato. Cálculo pela fórmula já validada: R$50,00 - comissão R$6,00 - tarifa fixa R$6,50 = R$37,50; envio protegido (37,50-25,63)*1,5%+1,49 = R$1,67. Líquido estimado R$35,83.",
+      "envio_protegido": true,
+      "net_received": null
     },
     {
       "id": "mesinha-centro",
@@ -133,12 +138,12 @@
     },
     {
       "id": "macbook-pro-16gb",
-      "name": "MacBook Pro — 16GB RAM",
+      "name": "MacBook Pro 13\" Mid 2010 — 16GB RAM",
       "category": "Eletrônico",
       "qty": 1,
       "condition": "Usado, funcionando",
       "asking_price": 750,
-      "sold_price": 750,
+      "sold_price": 750.0,
       "platform": "enjoei",
       "enjoei_mode": "classico",
       "status": "vendido",
@@ -148,16 +153,21 @@
       "photos": [
         "img/macbook-pro-16gb.jpg"
       ],
-      "net_received": 607.64,
+      "net_received": 609.59,
       "net_received_confirmed": false,
-      "notes": "Líquido calculado R$607,64 (comissão 12% = R$90 + tarifa fixa R$40 + envio protegido R$12,36). Bate com os ~R$609 lembrados. CONFIRMAR no extrato do Enjoei.",
+      "notes": "Vendido no Enjoei por R$750,00. Extrato (confirmado 30/09): comissão R$90,00 + tarifa fixa R$40,00 + envio protegido R$10,41 = R$140,41 de taxa. Total a receber R$609,59. ATENÇÃO: é um 13\" Mid 2010 com 16GB — diferente do outro Mid 2010 (6GB, tela inoperante, vendido por R$400 em dinheiro).",
       "open_questions": [
         "Ano/modelo deste MacBook? Se também for Mid 2010, os R$750 foram bem acima do mercado."
-      ]
+      ],
+      "envio_protegido": true,
+      "specs": {
+        "modelo": "MacBook Pro (13-inch, Mid 2010)",
+        "memoria": "16 GB"
+      }
     },
     {
       "id": "macbook-pro-2010-tela-quebrada",
-      "name": "MacBook Pro 13\" Mid 2010 — tela inoperante (funciona em monitor externo)",
+      "name": "MacBook Pro 13\" Mid 2010 — 6GB, tela inoperante",
       "category": "Eletrônico",
       "qty": 1,
       "condition": "Usado, tela inoperante — funciona em monitor externo",
@@ -187,19 +197,19 @@
         ],
         "assessment": "16 anos de idade, Core 2 Duo. O mercado real de venda é muito menor que os preços pedidos no ML. Com tela inoperante o valor justo cai para a faixa de R$200-400. A oferta de R$400 estava no topo da faixa — fechou nesse valor, confirmando a estimativa."
       },
-      "notes": "VENDIDO por R$400 em Pix, comprador retirou na residência. Anunciado por R$500; fechou em R$400, exatamente o topo da faixa estimada pela pesquisa de mercado. Sem taxa de plataforma (transação direta).",
+      "notes": "Vendido por R$400,00 em dinheiro (Pix na retirada), sem taxa — venda direta. ATENÇÃO: é o Mid 2010 de 6GB com tela inoperante — diferente do outro Mid 2010 (16GB, vendido por R$750 no Enjoei).",
       "open_questions": [
         "Canal de origem: Marketplace, OLX ou grupo do condomínio? (só para saber qual canal converte melhor)"
       ]
     },
     {
       "id": "controles-xbox360",
-      "name": "2 controles Xbox 360 + receptor wireless Microsoft original",
+      "name": "Kit gamer — 2 controles Xbox 360 + receptor USB Microsoft",
       "category": "Games",
       "qty": 1,
       "condition": "Usado, funcionando",
       "asking_price": 210,
-      "sold_price": 150,
+      "sold_price": 150.0,
       "platform": "enjoei",
       "enjoei_mode": "classico",
       "status": "vendido",
@@ -209,19 +219,25 @@
       "photos": [
         "img/controles-xbox360.jpg"
       ],
-      "notes": "Kit gamer: 2 controles Xbox 360 + receptor wireless Microsoft original. Anunciado por R$210 na Enjoei, comprador ofereceu R$150 e foi aceito. Taxa Enjoei (faixa até R$150): comissão 12% = R$18,00 + tarifa fixa R$12,50 = R$30,50. Líquido R$119,50. ENTREGA PENDENTE.",
+      "notes": "Extrato Enjoei (confirmado 30/09): vendido R$150,00 - comissão R$18,00 - tarifa fixa R$12,50 - envio protegido R$2,90 = R$116,60.",
       "open_questions": [
         "Custo de deslocamento/entrega até o comprador?"
-      ]
+      ],
+      "net_received": 116.6,
+      "envio_protegido": true,
+      "specs": {
+        "conteudo": "2 controles + receptor USB",
+        "marca": "Microsoft original"
+      }
     },
     {
       "id": "jaqueta-militar-verde-m",
-      "name": "Jaqueta militar verde feminina — tamanho M",
+      "name": "Jaqueta feminina verde militar — M",
       "category": "Vestuário",
       "qty": 1,
       "condition": "Usada",
       "asking_price": 50,
-      "sold_price": 50,
+      "sold_price": 60.0,
       "platform": "enjoei",
       "enjoei_mode": "classico",
       "status": "vendido",
@@ -231,10 +247,12 @@
       "photos": [
         "img/jaqueta-militar-verde-m.jpg"
       ],
-      "notes": "Vendida por R$50 na Enjoei (informado 26/09). Taxa Enjoei (faixa até R$50): comissão 12% = R$6,00 + tarifa fixa R$6,50 = R$12,50. Líquido R$37,50. CONFIRMAR plataforma no extrato — assumido Enjoei por ser o canal das roupas.",
+      "notes": "Extrato Enjoei (confirmado 30/09): vendido R$60,00 - comissão R$7,20 - tarifa fixa R$8,00 - envio protegido R$1,78 = R$43,02.",
       "open_questions": [
         "Confirmar no extrato do Enjoei que o líquido foi R$37,50"
-      ]
+      ],
+      "net_received": 43.02,
+      "envio_protegido": true
     },
     {
       "id": "maquina-lavar-mini",
@@ -243,35 +261,16 @@
       "qty": 1,
       "condition": "Usada",
       "asking_price": 250,
-      "sold_price": null,
-      "platform": null,
+      "sold_price": 250.0,
+      "platform": "facebook_marketplace",
       "enjoei_mode": null,
-      "status": "a_venda",
-      "payment_status": null,
+      "status": "vendido",
+      "payment_status": "recebido",
       "delivery_cost": null,
       "sold_at": null,
       "photos": [],
-      "notes": "Porte pequeno.",
-      "open_questions": [
-        "Capacidade em kg? (ajuda na copy do anúncio)"
-      ]
-    },
-    {
-      "id": "roupas",
-      "name": "Peças de roupas (lote)",
-      "category": "Vestuário",
-      "qty": null,
-      "condition": "Usada",
-      "asking_price": null,
-      "sold_price": null,
-      "platform": null,
-      "enjoei_mode": null,
-      "status": "a_venda",
-      "payment_status": null,
-      "delivery_cost": null,
-      "sold_at": null,
-      "photos": [],
-      "notes": "A separar. Decidir: lote único ou peça a peça."
+      "notes": "Vendida no Facebook Marketplace por R$250,00 (confirmado 30/09). Sem comissão — o custo real é o deslocamento/entrega, que ainda não foi lançado.",
+      "net_received": 250.0
     }
   ],
   "costs": {

@@ -217,10 +217,16 @@ function cardHTML(i){
 function render(){
   const out = filtered();
   const g = document.getElementById('grid');
-  g.innerHTML = out.length ? out.map(cardHTML).join('')
-    : '<div class="empty"><b>Nenhum item encontrado</b>Tente outra busca ou remova os filtros.</div>';
-  // contador reflete o que esta na tela: disponivel != vendido
   const disp = out.filter(i => !isSold(i)).length;
+  if (out.length){
+    g.innerHTML = out.map(cardHTML).join('');
+  } else if (state.showSold && ITEMS.some(isSold)) {
+    g.innerHTML = '<div class="empty"><b>Nada aqui com esses filtros</b>Remova os filtros ou limpe a busca.</div>';
+  } else {
+    // catalogo inteiro vendido: nao e erro, e o fim do desapego
+    g.innerHTML = '<div class="empty"><b>Tudo vendido</b>Obrigado a quem levou. '
+      + 'Nenhum item disponível no momento.</div>';
+  }
   const vend = out.length - disp;
   let txt = disp + (disp === 1 ? ' disponível' : ' disponíveis');
   if (vend) txt += ' · ' + vend + (vend === 1 ? ' vendido' : ' vendidos');
